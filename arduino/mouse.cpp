@@ -210,24 +210,27 @@ int step(int p1, int p2, int step)
 
 void besenhamMove(Point destination)
 {
-  calibrateScreen();
   calibrateMouse();
-  
-  while (!pointsEqual(MOUSE_POSITION, destination))
+  if (pointsEqual(destination, MOUSE_POSITION))
   {
-    int x1 = MOUSE_POSITION.x;
-    int y1 = MOUSE_POSITION.y;
-    int x2 = constrain(destination.x, 0, SCREEN_DIMENSIONS.x - 1);
-    int y2 = constrain(destination.y, 0, SCREEN_DIMENSIONS.y - 1);
+    return;
+  }
+
+  destination.x = constrain(destination.x, 0, SCREEN_DIMENSIONS.x - 1);
+  destination.y = constrain(destination.y, 0, SCREEN_DIMENSIONS.y - 1);
+
+  do
+  {
+    calibrateScreen();
+    calibrateMouse();
 
     int legalmove = 127;
 
-    int dx = step(x1,x2,legalmove);
-    int dy = step(y1,y2,legalmove);
+    int dx = step(MOUSE_POSITION.x, destination.x, legalmove);
+    int dy = step(MOUSE_POSITION.y, destination.y, legalmove);
 
     Mouse.move(dx,dy);
-    calibrateMouse();
-  }
+  } while (!pointsEqual(MOUSE_POSITION, destination));
 }
 
 bool pointsEqual(Point a, Point b)
