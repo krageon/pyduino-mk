@@ -48,8 +48,8 @@ After the Arduino sketch has been uploaded, the Arduino device is now ready to a
 To use PyDuino-MK, you must first import the Arduino-MK mouse/keyboard constants and the `Arduino` class encapsulating the Arduino commands. The mouse/keyboard constants are used to designate mouse buttons (i.e. `MOUSE_LEFT`, `MOUSE_RIGHT`) and keyboard keys (i.e. `F1`, `CTRL`, `INSERT`).
 
 ```python
-from arduino_mk.constants import *
-from arduino_mk import Arduino
+from pyduino_mk.constants import *
+from pyduino_mk import Arduino
 ```
 
 Instantiating the `Arduino` class is simple and easy.
