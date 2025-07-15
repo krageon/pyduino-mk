@@ -197,6 +197,21 @@ double quarticBezier(double t, double weights[4])
          1 * weights[4] * t4;
 }
 
+int step(int difference, int step)
+{
+  if (difference > step)
+  {
+    return step;
+  }
+
+  if (abs(difference) > step)
+  {
+    return step * -1;
+  }
+
+  return difference;
+}
+
 void besenhamMove(Point destination)
 {
   calibrateScreen();
@@ -209,50 +224,43 @@ void besenhamMove(Point destination)
     int x2 = constrain(destination.x, 0, SCREEN_DIMENSIONS.x - 1);
     int y2 = constrain(destination.y, 0, SCREEN_DIMENSIONS.y - 1);
     
+    int dx = x2 - x1;
+    int adx = abs(dx);
+
+    int dy = y2 - y1;
+    int ady = abs(dy);
+
     /*
      * If the slope is steep, invert the x and y values so
      * that we can iterate over the y-ordinate instead of the
      * x-ordinate.
      */
-    bool steep = abs(y2 - y1) / abs(x2 - x1);
-    
-    if (steep)
-    {
-      swap(x1, y1);
-      swap(x2, y2);
-    }
-    
+    bool steep = abs(ady) / abs(adx);
+
+    int step_size = 10;
+    int x_iterator = adx / step_size;
+    int y_iterator = ady / step_size;
+
+    int iterator = x_iterator > y_iterator ? x_iterator : y_iterator;
+
     /*
      * Depending on the quadrant, we must change the direction
      * in which the mouse moves.
      */
-    int x_step = (x1 < x2) ? 1 : -1;
-    int y_step = (y1 < y2) ? 1 : -1;
-    
-    int dx = abs(x2 - x1);
-    int dy = abs(y2 - y1);
-    
-    double slope = (double) dy / (double) dx;
-    double error = 0;
-    
-    for (int i = 0; i < dx; i++)
+    int x_step = (x1 < x2) ? step_size : (step_size * -1);
+    int y_step = (y1 < y2) ? step_size : (step_size * -1);
+
+    while (adx > 0 || ady > 0)
     {
-      if (!steep)
-        Mouse.move(x_step, 0);
-      else
-        Mouse.move(0, x_step);
-      
-      error += slope;
-      
-      if (error >= 0.5)
-      {
-        if (!steep)
-          Mouse.move(0, y_step);
-        else
-          Mouse.move(y_step, 0);
-        
-        error -= 1;
-      }
+      x_step = step(dx, step_size);
+      y_step = step(dy, step_size);
+
+      Mouse.move(x_step, y_step);
+
+      dx -= x_step;
+      adx = abs(dx);
+      dy -= y_step;
+      ady = abs(dy);
     }
     
     calibrateMouse();
